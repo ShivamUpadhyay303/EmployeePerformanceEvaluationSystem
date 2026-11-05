@@ -203,6 +203,8 @@ target/EmployeePerformanceEvaluationSystem-1.0-SNAPSHOT.war
 
 ### Step 7: Open the Application
 
+Open the following URL in your browser:
+
 ```text
 http://localhost:8080/EmployeePerformanceEvaluationSystem-1.0-SNAPSHOT/
 ```
@@ -268,7 +270,7 @@ The code is separated into model, DAO, servlet, and utility packages. SQL values
 | **Himanshu Raj Singh** | Frontend & UI Development | Worked on JSP page layouts, HTML/CSS interface design, dashboard presentation, navigation, forms, tables, and user-interface improvements. |
 | **Sahil Uttam** | Testing & Documentation | Worked on checking application workflows, testing module behaviour, identifying issues, preparing project documentation and presentation material, and supporting review preparation. |
 
-*The team should confirm that this proposed responsibility division accurately reflects each member's actual contribution before final submission.*
+*The team should confirm that this responsibility division accurately reflects each member's actual contribution before final submission.*
 
 ## 14. Future Enhancements
 
