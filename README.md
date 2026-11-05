@@ -1,265 +1,293 @@
 # Employee Performance Evaluation System (EPES)
 
-A Java-based web application designed to manage employee information, performance evaluations, goals, feedback, and performance reports.
+A Java-based web application for managing employee information and supporting performance evaluations, goal tracking, feedback, and performance summaries. EPES provides separate Manager and Employee experiences with role-based access.
 
 ## 1. Project Overview
 
-The Employee Performance Evaluation System (EPES) is a web-based application that simplifies employee performance management.
-
-It provides separate access for Managers and Employees. Managers can manage employee records, evaluate performance, assign goals, and provide feedback. Employees can log in to view their performance reports, track goals, and review feedback.
+EPES brings employee records and performance-related activities into one application. Managers can manage employee records, create evaluations, assign goals, provide feedback, and review performance summaries. Employees can sign in to view their own performance information, goals, and feedback.
 
 ## 2. Project Objectives
 
-- Simplify employee performance evaluation.
-- Maintain employee information digitally.
-- Allow managers to evaluate employee performance.
-- Track employee goals and progress.
-- Improve communication through structured feedback.
-- Provide secure and role-based access.
+- Centralize employee information and performance records.
+- Support manager-led performance evaluations and feedback.
+- Assign goals and track employee progress.
+- Allow employees to view their own performance information.
+- Protect application functions through authentication and role-based authorization.
 
-## 3. Technologies Used
+## 3. Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Java 25 | Backend development |
-| Jakarta Servlets 6.1 | Request handling |
-| JSP | Dynamic web pages |
-| HTML5 | Web page structure |
-| CSS3 | Styling and responsive design |
-| JavaScript | Frontend functionality |
-| MySQL 8 | Database management |
-| JDBC | Database connectivity |
+| Java 25 | Application logic |
+| Jakarta Servlet 6.1 | HTTP request handling |
+| JSP, HTML5, CSS3, JavaScript | User interface |
+| MySQL 8 | Relational database |
+| JDBC / MySQL Connector/J 9.4.0 | Database connectivity |
 | Apache Tomcat 11 | Application server |
 | Maven | Build and dependency management |
 | IntelliJ IDEA | Development environment |
 
 ## 4. Main Features
 
-### Manager Module
+### Manager Features
 
-- Secure manager login.
-- Add new employee records.
-- View the employee directory.
-- Update employee information.
-- Delete employee records.
-- Add employee performance evaluations.
-- Assign goals to employees.
-- Track employee goal progress.
-- Provide ratings and feedback.
-- View employee performance reports.
+- Manager sign-in.
+- Add, view, update, and delete employee records.
+- Create performance evaluations and assign ratings.
+- Assign employee goals and manage goal status.
+- Provide employee feedback.
+- View employee performance summaries and reports.
 
-### Employee Module
+### Employee Features
 
-- Secure employee login.
+- Employee sign-in.
 - Personalized employee dashboard.
-- View personal performance evaluations.
-- View overall performance ratings.
-- View assigned goals.
-- Update goal progress.
-- View feedback provided by managers.
+- View personal performance evaluations and ratings.
+- View assigned goals and update goal progress.
+- View feedback provided by the manager.
 
-## 5. Security Features
+## 5. Application Architecture
 
-- Password hashing using PBKDF2WithHmacSHA256.
-- Role-based access control for Managers and Employees.
-- Session management and secure logout.
-- CSRF protection for POST requests.
-- Prepared statements for database operations.
-- Input validation in application modules.
-- Database CHECK constraints for ratings and goal statuses.
-- Employee-specific data access using authenticated employee IDs.
+The application follows a layered Java web architecture:
+
+1. **Presentation Layer:** JSP pages, HTML, CSS, and JavaScript.
+2. **Controller Layer:** Jakarta Servlets handle authentication and application requests.
+3. **Security Layer:** Filters enforce authentication, authorization, and CSRF validation.
+4. **Data Access Layer:** DAO classes perform database operations using JDBC.
+5. **Database Layer:** MySQL stores users, employees, evaluations, goals, feedback, teams, and team membership.
 
 ## 6. Database Design
 
-**Database name:** `epes_db`
+**Database Name:** `epes_db`
 
-The project uses MySQL to store employee and performance-related information.
-
-### Database Tables
+The database contains eight tables:
 
 | Table | Purpose |
 |---|---|
-| employees | Stores employee information |
-| users | Stores login accounts and roles |
-| evaluations | Stores performance evaluation records |
-| goals | Stores employee goals and progress |
-| feedback | Stores manager feedback |
-| teams | Stores team information |
-| team_members | Maintains employee-team relationships |
-| performance_reports | Reserved for report data; reports are currently calculated dynamically by the application |
+| `employees` | Employee profile information |
+| `users` | Login email, password hash, role, and employee link |
+| `evaluations` | Evaluation criteria, ratings, and comments |
+| `goals` | Goal descriptions, target dates, and statuses |
+| `feedback` | Employee feedback ratings and comments |
+| `teams` | Team information |
+| `team_members` | Employee-to-team relationships |
+| `performance_reports` | Report-related summary structure; report values are currently calculated dynamically |
 
-The database uses primary keys, foreign keys, and CHECK constraints to maintain data integrity.
+The database schema uses primary keys, foreign keys, unique constraints, and CHECK constraints.
 
-### Database Constraints
+- Evaluation ratings are restricted to 1–5.
+- Feedback ratings are restricted to 1–5.
+- Goal status is restricted to `Pending`, `In Progress`, or `Completed`.
 
-- Evaluation ratings must be between 1 and 5.
-- Feedback ratings must be between 1 and 5.
-- Goal status must be Pending, In Progress, or Completed.
+**Important:** The `epes_database.sql` file contains the database structure only. It does not include sample employee records or login accounts.
 
-## 7. Project Structure
+## 7. Security Features
 
-The project follows a modular Java web application structure.
+- Passwords are hashed using PBKDF2WithHmacSHA256 with a per-password random salt.
+- Manager and Employee roles are checked before protected operations.
+- Login creates a fresh authenticated session and rotates the CSRF token.
+- State-changing POST forms include a CSRF token validated by a filter.
+- Logout is performed through a POST request.
+- JDBC operations use `PreparedStatement` parameters.
+- Server-side validation checks IDs, ratings, statuses, and required fields.
+- Session cookies are configured as HttpOnly, and session tracking is cookie-only.
+
+## 8. Project Structure
 
 ```text
 EmployeePerformanceEvaluationSystem/
 │
+├── .mvn/
+│   └── wrapper/
+│
 ├── src/
 │   └── main/
-│       ├── java/
-│       │   └── com/epe/employeeperformanceevaluationsystem/
-│       │       ├── dao/
-│       │       ├── model/
-│       │       ├── servlet/
-│       │       └── util/
+│       ├── java/com/epe/employeeperformanceevaluationsystem/
+│       │   ├── dao/          # Database access classes
+│       │   ├── model/        # Application model classes
+│       │   ├── servlet/      # Servlets and security filters
+│       │   └── util/         # Database, password, CSRF and HTML utilities
 │       │
 │       └── webapp/
 │           ├── WEB-INF/
-│           ├── css/
-│           ├── index.jsp
-│           ├── employee-dashboard.jsp
-│           ├── manager-dashboard.jsp
-│           ├── employees.jsp
-│           ├── edit-employee.jsp
-│           ├── evaluations.jsp
-│           ├── goals.jsp
-│           ├── feedback.jsp
-│           └── other JSP pages
+│           │   ├── web.xml
+│           │   └── views/    # Protected JSP views
+│           └── *.jsp         # Login, dashboards and application pages
 │
-├── .mvn/
+├── screenshots/              # Application screenshots
+│   ├── login.png
+│   ├── manager-dashboard.png
+│   ├── employee-dashboard.png
+│   ├── employee-management.png
+│   ├── evaluations.png
+│   ├── goals.png
+│   ├── feedback.png
+│   └── reports.png
+│
+├── epes_database.sql
 ├── mvnw
 ├── mvnw.cmd
-├── epes_database.sql
 ├── pom.xml
-├── README.md
-└── README_Review1_Backup.md
+└── README.md
 ```
 
-## 8. System Requirements
-
-Install the following software before running the application:
+## 9. System Requirements
 
 - JDK 25
 - MySQL Server 8
-- MySQL Workbench
+- MySQL Workbench (recommended)
 - Apache Tomcat 11
-- IntelliJ IDEA
-- Git (for version control)
+- Git
+- IntelliJ IDEA or another Java IDE
 
-## 9. Installation and Setup
+## 10. Installation and Setup
 
 ### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/ShivamUpadhyay303/EmployeePerformanceEvaluationSystem.git
+cd EmployeePerformanceEvaluationSystem
 ```
 
-Open the downloaded project in IntelliJ IDEA.
-
-### Step 2: Create the Database
+### Step 2: Create and Import the Database
 
 1. Open MySQL Workbench and connect to your MySQL server.
-2. Create the database by executing:
+2. Create the database:
 
 ```sql
 CREATE DATABASE epes_db;
 ```
 
-3. Select `epes_db` as the default schema in MySQL Workbench before executing the SQL file.
-4. Open the `epes_database.sql` file from the project root folder.
-5. Execute its SQL statements in MySQL Workbench.
-6. Refresh the SCHEMAS panel and verify that all eight tables have been created.
+3. Select `epes_db` as the default schema.
+4. Open `epes_database.sql` from the project root.
+5. Execute the SQL script.
+6. Refresh the SCHEMAS panel and verify that all eight tables exist.
 
-**Note:** The SQL file contains database structure only. It does not contain existing employee records or login accounts. Create the required records and manager account separately.
+**Note:** The SQL file contains the database structure only. It does not create sample employee records or login accounts.
 
-### Step 3: Configure Database Connection
+### Step 3: Configure the Database Password
 
-Configure your MySQL connection in the DBConnection utility.
+The application reads the MySQL password from the `EPES_DB_PASSWORD` environment variable. Do not hardcode the password or commit it to GitHub.
 
-Set the environment variable:
-
-```text
-EPES_DB_PASSWORD
-```
-
-Use the password of your configured MySQL account as its value.
-
-Do not commit database passwords or other secrets to GitHub.
-
-### Step 4: Build the Project
-
-Open a terminal in the project root directory and execute:
+For a temporary PowerShell session, set the variable before starting Tomcat:
 
 ```powershell
-java -classpath .mvn\wrapper\maven-wrapper.jar "-Dmaven.multiModuleProjectDirectory=$PWD" org.apache.maven.wrapper.MavenWrapperMain package
+$env:EPES_DB_PASSWORD = "your_mysql_password"
 ```
 
-After a successful build, Maven generates the WAR file inside the `target` directory.
+The current database username is configured as `root` in `DBConnection.java`. For production deployment, use a dedicated MySQL application account with only the required permissions.
 
-### Step 5: Deploy on Apache Tomcat
+### Step 4: Create Login Accounts
 
-1. Copy the generated WAR file from the `target` directory.
-2. Place it inside the Tomcat `webapps` directory.
-3. Start the Tomcat server.
-4. Wait for the application to deploy.
+Use the `UserSetup` utility from the IDE to create the initial Manager account. Create Employee accounts using valid employee IDs. Passwords are hashed before storage.
 
-### Step 6: Open the Application
+### Step 5: Build the Application
 
-Open the following URL in your browser:
+From the project root, run:
+
+```powershell
+.\mvnw.cmd clean package
+```
+
+A successful build creates:
+
+```text
+target/EmployeePerformanceEvaluationSystem-1.0-SNAPSHOT.war
+```
+
+### Step 6: Deploy to Tomcat
+
+1. Stop Tomcat.
+2. Copy the generated WAR file into Tomcat's `webapps` directory.
+3. Start Tomcat and wait for deployment to finish.
+
+### Step 7: Open the Application
 
 ```text
 http://localhost:8080/EmployeePerformanceEvaluationSystem-1.0-SNAPSHOT/
 ```
 
-## 10. Testing
+## 11. Application Screenshots
 
-The following application features have been tested:
+The following screenshots demonstrate the actual user interface of the Employee Performance Evaluation System.
 
-- Manager and employee login.
-- Employee management operations (Add, View, Update, Delete).
-- Manager and employee dashboard access.
-- Role-based access restrictions.
-- Performance evaluation functionality.
-- Goal management and progress updates.
-- Feedback management.
-- Performance report access.
-- Logout and protected-page access.
-- Database CHECK constraint enforcement.
-- Maven project build.
+### 11.1 Login Page
 
-## 11. Screenshots
+![EPES Login Page](screenshots/login.png)
 
-Add actual screenshots of the following application pages:
+### 11.2 Manager Dashboard
 
-- Login Page
-- Manager Dashboard
-- Employee Dashboard
-- Employee Management
-- Performance Evaluations
-- Goal Management
-- Feedback Page
-- Performance Reports
+![EPES Manager Dashboard](screenshots/manager-dashboard.png)
 
-## 12. Future Enhancements
+### 11.3 Employee Dashboard
 
-- Forgot Password functionality.
-- Automatic employee account creation.
-- Email notifications.
-- Downloadable performance reports.
+![EPES Employee Dashboard](screenshots/employee-dashboard.png)
 
-## 13. GitHub Repository
+### 11.4 Employee Management
 
-**Repository Link:** https://github.com/ShivamUpadhyay303/EmployeePerformanceEvaluationSystem
+![EPES Employee Management](screenshots/employee-management.png)
 
-## 14. Team Members
+### 11.5 Performance Evaluations
 
-Add the actual names of project team members and their respective contributions here.
+![EPES Performance Evaluations](screenshots/evaluations.png)
 
-## 15. Project Status
+### 11.6 Goal Management
 
-The main application modules and core functional tests have been completed. Documentation, repository preparation, and final presentation are being finalized.
+![EPES Goal Management](screenshots/goals.png)
+
+### 11.7 Feedback Management
+
+![EPES Feedback Management](screenshots/feedback.png)
+
+### 11.8 Performance Reports
+
+![EPES Performance Reports](screenshots/reports.png)
+
+## 12. Testing and Code Quality
+
+Functional checks performed during development include:
+
+- Manager and Employee login.
+- Employee add, view, update, and delete operations.
+- Role-based restrictions on manager-only pages.
+- Employee access to employee-specific performance information.
+- Logout and protected-page access checks.
+- Rating and goal-status validation, including database CHECK constraints.
+- CSRF token inclusion in state-changing forms.
+- Maven packaging/build checks on the development computer.
+
+The code is separated into model, DAO, servlet, and utility packages. SQL values are passed through prepared statements, and database resources use try-with-resources.
+
+**Testing Note:** The project includes standalone manual test utilities. These should not be described as a complete automated JUnit test suite.
+
+## 13. Team Members and Responsibilities
+
+| Team Member | Role | Responsibilities |
+|---|---|---|
+| **Shivam Kumar Upadhyay** | **Team Leader – Backend & Integration** | Coordinated project planning and task distribution; worked on Servlets, DAO classes, JDBC/database connectivity, authentication, session management, role-based access, and module integration. |
+| **Himanshu Raj Singh** | Frontend & UI Development | Worked on JSP page layouts, HTML/CSS interface design, dashboard presentation, navigation, forms, tables, and user-interface improvements. |
+| **Sahil Uttam** | Testing & Documentation | Worked on checking application workflows, testing module behaviour, identifying issues, preparing project documentation and presentation material, and supporting review preparation. |
+
+*The team should confirm that this proposed responsibility division accurately reflects each member's actual contribution before final submission.*
+
+## 14. Future Enhancements
+
+- Password reset and account recovery workflow.
+- Optional employee account creation during employee onboarding.
+- Email notifications for goals, evaluations, and feedback.
+- Downloadable PDF performance reports.
+- Department-wise analytics and performance trend visualizations.
+
+## 15. GitHub Repository
+
+**Repository:** [EmployeePerformanceEvaluationSystem](https://github.com/ShivamUpadhyay303/EmployeePerformanceEvaluationSystem)
+
+The repository is public and contains the project source code, database structure, documentation, and application screenshots.
 
 ---
 
 **Employee Performance Evaluation System (EPES)**
 
-Developed as an academic project.
+Galgotias University | B.Tech CSE (AI & ML)
+
+Team: Shivam Kumar Upadhyay • Himanshu Raj Singh • Sahil Uttam
